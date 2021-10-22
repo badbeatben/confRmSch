@@ -16,7 +16,7 @@ import {
   addHours,
 } from 'date-fns';
 import { Subject } from 'rxjs';
-// import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   CalendarEvent,
   CalendarEventAction,
@@ -41,12 +41,13 @@ const colors: any = {
 
 @Component({
   selector: 'app-calendar',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
 export class CalendarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private modal: NgbModal) { }
 
   ngOnInit(): void {
   }
@@ -160,7 +161,7 @@ export class CalendarComponent implements OnInit {
 
   handleEvent(action: string, event: CalendarEvent): void {
     this.modalData = { event, action };
-    // this.modal.open(this.modalContent, { size: 'lg' });
+    this.modal.open(this.modalContent, { size: 'lg' });
   }
 
   addEvent(): void {
