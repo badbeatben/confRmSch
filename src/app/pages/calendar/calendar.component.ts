@@ -51,6 +51,7 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
 
   view: CalendarView = CalendarView.Month;
