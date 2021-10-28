@@ -1,3 +1,4 @@
+<h1>Conference Room Scheduler</h1>
 <div class="row text-center">
     <div class="col-md-4">
         <div class="btn-group">
@@ -34,7 +35,7 @@
     </div>
 </div>
 <br />
-<div [ngSwitch]="view">
+<div class="margins" [ngSwitch]="view">
     <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
         [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)"
         (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
@@ -48,19 +49,19 @@
     </mwl-calendar-day-view>
 </div>
 
-<!-- Everything you see below is just for the demo, you don't need to include it in your app -->
+<!-- Everything below is for seeing event info -->
 
-<br /><br /><br />
+<!-- <br /><br /><br />
 
 <h3>
-    Edit events
-    <button class="btn btn-primary float-right" (click)="addEvent()">
+    Scheduled Events
+    <button style="margin-left: 16px;" class="btn btn-primary float-right" (click)="addEvent()">
         Add new
     </button>
     <div class="clearfix"></div>
 </h3>
 
-<div class="table-responsive">
+<div class="table-responsive margins">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -102,23 +103,67 @@
             </tr>
         </tbody>
     </table>
-</div>
+</div> -->
 
 <ng-template #modalContent let-close="close">
     <div class="modal-header">
-        <h5 class="modal-title">Event action occurred</h5>
+        <h5 class="modal-title">{{ modalData?.event.title }}</h5>
         <button type="button" class="close" (click)="close()">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">
-        <div>
-            Action:
-            <pre>{{ modalData?.action }}</pre>
-        </div>
-        <div>
-            Event:
-            <pre>{{ modalData?.event | json }}</pre>
+        <div class="table-responsive margins">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+        
+                <tbody>
+                    <tr>
+                        <td>Title: </td>
+                        <td>
+                            <input type="text" class="form-control" [(ngModel)]="modalData.event.title" (keyup)="refresh.next()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Primary Color: </td>
+                        <td>
+                            <input type="color" [(ngModel)]="modalData.event.color.primary" (change)="refresh.next()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Secondary Color: </td>
+                        <td>
+                            <input type="color" [(ngModel)]="modalData.event.color.secondary" (change)="refresh.next()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Event Start: </td>
+                        <td>
+                            <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.start"
+                                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
+                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Event End: </td>
+                        <td>
+                            <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.end"
+                                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
+                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <button style="margin-top: 16px;" class="btn btn-danger" (click)="deleteEvent(event)">
+                        Delete
+                    </button>
+                </tfoot>
+            </table>
         </div>
     </div>
     <div class="modal-footer">
