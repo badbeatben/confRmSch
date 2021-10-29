@@ -14,11 +14,13 @@ import { FormsModule } from '@angular/forms';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { environment } from 'src/environments/environment';
+import { LoginComponent } from './pages/login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CalendarComponent
+    CalendarComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
