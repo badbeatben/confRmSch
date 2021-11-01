@@ -1,1 +1,14 @@
-<p>register works!</p>
+<div class="container">
+    <div style="margin-top: 64px;">
+        <h1>Register</h1>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <label>Email: </label>
+            <input class="input-lg form-control" placeholder="name@example.com" [(ngModel)]="email">
+            <label>Password: </label>
+            <input class="input-lg form-control" placeholder="Password" [(ngModel)]="password">
+            <button class="btn btn-submit" [disabled]="disabled" (click)="register()">Register</button>
+        </div>
+    </div>
+</div>

@@ -37,7 +37,9 @@ export class ApiService {
     return new Promise<any>((resolve, reject) => {
       this.fireAuth.auth.createUserWithEmailAndPassword(email, password)
         .then(res => {
+          console.log('create user response: ', res);
           if (res.user) {
+            console.log('res.user is true: ', res.user);
             resolve(res.user);
           } else {
             reject(res);
@@ -54,7 +56,7 @@ export class ApiService {
       this.fireAuth.auth.signInWithEmailAndPassword(email, password)
         .then(res => {
           if (res.user) {
-            console.log("sign in resp: ", res);
+            console.log("sign in user info: ", res);
             resolve(res.user);
           }
           else {

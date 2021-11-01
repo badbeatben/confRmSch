@@ -4,8 +4,10 @@
     </div>
     <div class="panel-body">
         <div class="input-group">
+            <label for="email">Email</label>
             <input class="input-lg form-control" placeholder="name@example.com" [(ngModel)]="email">
             <input class="input-lg form-control" placeholder="Password" [(ngModel)]="password">
+            <button class="btn btn-submit" [disabled]="disabled" (click)="login()">Login</button>
         </div>
     </div>
 </div>
