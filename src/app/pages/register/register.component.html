@@ -1,14 +1,73 @@
-<div class="container">
-    <div style="margin-top: 64px;">
-        <h1>Register</h1>
-    </div>
-    <div class="panel-body">
-        <div class="input-group">
-            <label>Email: </label>
-            <input class="input-lg form-control" placeholder="name@example.com" [(ngModel)]="email">
-            <label>Password: </label>
-            <input class="input-lg form-control" placeholder="Password" [(ngModel)]="password">
-            <button class="btn btn-submit" [disabled]="disabled" (click)="register()">Register</button>
-        </div>
+<mat-toolbar style="margin-top: 128px;" fxLayout="column" fxLayoutAlign="center center">
+    <h1>Sign Up</h1>
+</mat-toolbar>
+<div>
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <form [formGroup]="this.form" #formData='ngForm' fxLayout="column"
+            style="max-width: 600px;margin:32px;width:90%">
+            <div class="form-group" style="margin-bottom: 32px;">
+                <mat-form-field style="flex: 1 1 0px">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" required (blur)="checkIfEmailTaken($event)">
+                    <mat-error *ngIf="this.form.controls['email'].invalid">{{getEmailErrorMessage()}}</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password" required>
+                    <mat-error *ngIf="this.form.controls['password'].invalid">{{getPasswordErrorMessage()}}</mat-error>
+                </mat-form-field>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 32px;">
+                <mat-form-field style="flex: 1 1 0px">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="firstName">
+                </mat-form-field>
+
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lastName">
+                </mat-form-field>
+            </div>
+
+
+            <div class="form-group" style="margin-bottom: 32px;">
+                <mat-form-field style="flex: 1 1 0px">
+                    <mat-label>Phone</mat-label>
+                    <input matInput formControlName="phone">
+                </mat-form-field>
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>Address</mat-label>
+                    <input matInput formControlName="address">
+                </mat-form-field>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 32px;">
+                <mat-form-field style="flex: 1 1 0px;">
+                    <mat-label>City</mat-label>
+                    <input matInput formControlName="city">
+                </mat-form-field>
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>State</mat-label>
+                    <input matInput formControlName="state">
+                </mat-form-field>
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>Zip Code</mat-label>
+                    <input matInput formControlName="zip">
+                </mat-form-field>
+            </div>
+            
+            <div fxLayout="column" fxLayoutAlign="space-around center">
+                <button mat-raised-button (click)="onSubmit(formData)" [disabled]="!formData.valid"
+                    style="width: 50%;margin: 16px;">
+                    Sign Up
+                </button>
+                <div>
+                    Already have an account? <a mat-button routerLink="/login">Login</a>
+                </div>
+            </div>
+        </form>
+
     </div>
 </div>

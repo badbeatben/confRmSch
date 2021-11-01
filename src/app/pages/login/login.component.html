@@ -1,13 +1,36 @@
-<div class="container">
-    <div style="margin-top: 64px;">
-        <h1>Login</h1>
-    </div>
-    <div class="panel-body">
-        <div class="input-group">
-            <label for="email">Email</label>
-            <input class="input-lg form-control" placeholder="name@example.com" [(ngModel)]="email">
-            <input class="input-lg form-control" placeholder="Password" [(ngModel)]="password">
-            <button class="btn btn-submit" [disabled]="disabled" (click)="login()">Login</button>
+<mat-toolbar style="margin-top: 128px;" fxLayout="column" fxLayoutAlign="center center">
+    <h1>Log in</h1>
+</mat-toolbar>
+<div>
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <form [formGroup]="this.form" #formData='ngForm' (ngSubmit)='onSubmit(formData)' fxLayout="column"
+            style="max-width:600px; margin:32px; width:90%">
+            <div class="form-group" style="margin-bottom: 32px;">
+                <mat-form-field style="flex: 1 1 0px">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" required>
+                    <mat-error *ngIf="this.form.controls['email'].invalid">Email is <strong>required</strong></mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="left-margin" style="flex: 1 1 0px;">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password" required>
+                    <mat-error *ngIf="this.form.controls['password'].invalid">Password is <strong>required</strong></mat-error>
+                </mat-form-field>
+            </div>
+
+            <button mat-button [disabled]="!formData.valid" (click)="onSubmit(formData)">
+                Log In
+            </button>
+        </form>
+
+        <!-- <div class="forgotPassword">
+            <span routerLink="/forgot-password">Forgot Password?</span>
+        </div> -->
+
+        <div style="margin-bottom: 32px;">
+            <span>Don't have an account?<a mat-button routerLink="/register"> Sign Up</a></span>
         </div>
+
     </div>
 </div>

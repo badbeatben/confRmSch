@@ -1,0 +1,14 @@
+.form-group{
+    display: flex;
+}
+.left-margin{
+    margin-left: 32px;
+}
+@media(max-width: 675px) {
+    .form-group{
+        flex-direction: column;
+    }
+    .left-margin{
+        margin-left: 0;
+    }
+}

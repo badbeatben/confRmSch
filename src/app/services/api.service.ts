@@ -5,6 +5,7 @@ import { AngularFirestore } from 'angularfire2/firestore';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { CalendarEvent } from 'angular-calendar';
 import { User } from '../models/user';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export class AuthInfo {
   constructor(public $uid: string) { }
@@ -23,7 +24,8 @@ export class ApiService {
 
   constructor(
     private db: AngularFirestore,
-    private fireAuth: AngularFireAuth
+    private fireAuth: AngularFireAuth,
+    private snackbar: MatSnackBar
   ) { 
     this.fireAuth.authState.pipe(take(1)).subscribe(user => {
       if (user) {
@@ -37,9 +39,8 @@ export class ApiService {
     return new Promise<any>((resolve, reject) => {
       this.fireAuth.auth.createUserWithEmailAndPassword(email, password)
         .then(res => {
-          console.log('create user response: ', res);
           if (res.user) {
-            console.log('res.user is true: ', res.user);
+            this.authInfo$.next(new AuthInfo(res.user.uid));
             resolve(res.user);
           } else {
             reject(res);
@@ -95,6 +96,10 @@ export class ApiService {
       });
     });
   }
+
+  public checkIfEmailTaken(email: string): Observable<any> {
+    return this.db.collection('users', ref => ref.where('email', '==', email)).snapshotChanges();
+  }
   // End login and auth area
   
   // Events Region
@@ -108,10 +113,14 @@ export class ApiService {
   }
 
   async addEvent(event: CalendarEvent) {
-    const doc_ref = await this.db.collection('events').add(event);
-    console.log(doc_ref);
-    event.id = doc_ref.id;
-    this.updateEvent(event);
+    this.db.collection('events').doc(event.id.toString()).set(Object.assign({}, event)).then(success => {
+      console.log('Success ', success);
+      this.snackbarMessage('Event added successfully');
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
   }
 
   updateEvent(event: CalendarEvent) {
@@ -135,10 +144,14 @@ export class ApiService {
   }
 
   async addUser(user: User) {
-    const doc_ref = await this.db.collection('users').add(user);
-    console.log(doc_ref);
-    user.id = doc_ref.id;
-    this.updateUser(user);
+    this.db.collection('users').doc(user.id).set(Object.assign({}, user)).then(success => {
+      console.log('Success ', success);
+      this.snackbarMessage('User added successfully');
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
   }
 
   updateUser(user: User) {
@@ -150,5 +163,15 @@ export class ApiService {
   }
   // End of Users Region
 
+
+  // Display Snackbar Message
+  snackbarMessage(message: string) {
+    this.snackbar.open(message, 'Okay', {
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      duration: 5000
+    });
+  }
+  
 
 }

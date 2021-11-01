@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 
@@ -8,36 +9,29 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  email: string;
-  password: string;
-  disabled: boolean = false;
-  spinner: boolean = false;
+  
+  form = new FormGroup({ 
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)])
+  });
 
   constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit() {
-    this.email = '';
-    this.password = '';
+    
   }
 
-  setSpinner() {
-    this.spinner = true;
-    this.disabled = true;
-  }
-
-  clearSpinner() {
-    this.spinner = false;
-    this.disabled = false;
-  }
-
-  login() {
-    this.api.login(this.email, this.password).then(resp => {
-      if (resp['id']) {
-        this.router.navigate(['calendar']);
-      } else {
-        this.router.navigate(['register']);
-      }
-    });
+  onSubmit(formData: any) {
+    if (formData.valid) {
+      this.api.login(this.form.value.email, this.form.value.password).then(resp => {
+        if (resp['id']) {
+          this.router.navigate(['calendar']);
+        } else {
+          this.router.navigate(['register']);
+        }
+      });
+    }
+    
   }
 
 }
