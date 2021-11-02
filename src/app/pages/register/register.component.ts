@@ -31,7 +31,11 @@ export class RegisterComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    
+    this.api.authInfo$.subscribe(res => {
+      if (res.isLoggedIn()) {
+        this.router.navigate(['calendar']);
+      }
+    });
   }
 
   onSubmit(formData: any) {

@@ -144,9 +144,12 @@
                     <tr>
                         <td>Event Start: </td>
                         <td>
-                            <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.start"
+                            <mat-form-field style="padding-left: 8px;">
+                                <input matInput type="datetime-local" placeholder="start date">
+                            </mat-form-field>
+                            <!-- <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.start"
                                 (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
-                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
+                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" /> -->
                         </td>
                     </tr>
                     <tr>

@@ -29,15 +29,15 @@ import { Router } from '@angular/router';
 const colors: any = {
   red: {
     primary: '#ad2121',
-    secondary: '#FAE3E3',
+    secondary: '#FAE3E3'
   },
   blue: {
     primary: '#1e90ff',
-    secondary: '#D1E8FF',
+    secondary: '#D1E8FF'
   },
   yellow: {
     primary: '#e3bc08',
-    secondary: '#FDF1BA',
+    secondary: '#FDF1BA'
   },
 };
 
@@ -59,68 +59,31 @@ export class CalendarComponent implements OnInit {
     this.api.authInfo$.subscribe(res => {
       if (res.isLoggedIn()) {
         console.log("uid: ", res.$uid);
-        this.actions = [
-          {
-            label: '<i class="fas fa-fw fa-pencil-alt"></i>',
-            a11yLabel: 'Edit',
-            onClick: ({ event }: { event: CalendarEvent }): void => {
-              this.handleEvent('Edited', event);
-            },
-          },
-          {
-            label: '<i class="fas fa-fw fa-trash-alt"></i>',
-            a11yLabel: 'Delete',
-            onClick: ({ event }: { event: CalendarEvent }): void => {
-              this.events = this.events.filter((iEvent) => iEvent !== event);
-              this.handleEvent('Deleted', event);
-            },
-          },
-        ];
-        this.events = [
-          {
-            start: subDays(startOfDay(new Date()), 1),
-            end: addDays(new Date(), 1),
-            title: 'A 3 day event',
-            color: colors.red,
-            actions: this.actions,
-            allDay: true,
-            resizable: {
-              beforeStart: true,
-              afterEnd: true,
-            },
-            draggable: true,
-          },
-          {
-            start: startOfDay(new Date()),
-            title: 'An event with no end date',
-            color: colors.yellow,
-            actions: this.actions,
-          },
-          {
-            start: subDays(endOfMonth(new Date()), 3),
-            end: addDays(endOfMonth(new Date()), 3),
-            title: 'A long event that spans 2 months',
-            color: colors.blue,
-            allDay: true,
-          },
-          {
-            start: addHours(startOfDay(new Date()), 2),
-            end: addHours(new Date(), 2),
-            title: 'A draggable and resizable event',
-            color: colors.yellow,
-            actions: this.actions,
-            resizable: {
-              beforeStart: true,
-              afterEnd: true,
-            },
-            draggable: true,
-          },
-        ];
+        
+        this.api.getAllEvents().subscribe(resp => {
+          if (resp) {
+            resp.forEach(event => {
+              this.events.push({
+                start: event.start.toDate(),
+                end: event.end.toDate(),
+                id: event.id,
+                title: event.title,
+                allDay: event.allDay,
+                color: colors.red,
+                resizable: {
+                  beforeStart: true,
+                  afterEnd: true
+                },
+                draggable: true
+              });
+            });
+            this.refresh.next();
+          }
+        });
       } else {
         this.router.navigate(['register']);
       }
     });
-    
   }
   
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
@@ -133,7 +96,6 @@ export class CalendarComponent implements OnInit {
     event: CalendarEvent;
   };
 
-  actions: CalendarEventAction[] = []
   events: CalendarEvent[] = [];
 
   refresh: Subject<any> = new Subject();

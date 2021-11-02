@@ -57,7 +57,7 @@ export class ApiService {
       this.fireAuth.auth.signInWithEmailAndPassword(email, password)
         .then(res => {
           if (res.user) {
-            console.log("sign in user info: ", res);
+            this.authInfo$.next(new AuthInfo(res.user.uid));
             resolve(res.user);
           }
           else {
@@ -108,8 +108,8 @@ export class ApiService {
     return this.db.collection('events').doc(id).valueChanges() as Observable<CalendarEvent>;
   }
 
-  getAllEvents(): Observable<CalendarEvent[]> {
-    return this.db.collection('events').valueChanges() as Observable<CalendarEvent[]>;
+  getAllEvents(): Observable<any[]> {
+    return this.db.collection('events').valueChanges() as Observable<any[]>;
   }
 
   async addEvent(event: CalendarEvent) {

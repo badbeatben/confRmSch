@@ -8,7 +8,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'calendar', component: CalendarComponent },
-  { path: '', component: RegisterComponent }
+  { path: '', component: CalendarComponent }
 ];
 
 @NgModule({

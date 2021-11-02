@@ -18,13 +18,17 @@ export class LoginComponent implements OnInit {
   constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit() {
-    
+    this.api.authInfo$.subscribe(res => {
+      if (res.isLoggedIn()) {
+        this.router.navigate(['calendar']);
+      }
+    });
   }
 
   onSubmit(formData: any) {
     if (formData.valid) {
       this.api.login(this.form.value.email, this.form.value.password).then(resp => {
-        if (resp['id']) {
+        if (resp.uid) {
           this.router.navigate(['calendar']);
         } else {
           this.router.navigate(['register']);
