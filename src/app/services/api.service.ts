@@ -103,6 +103,11 @@ export class ApiService {
   // End login and auth area
   
   // Events Region
+  roundToNearestFive(date: Date): Date {
+    var coeff = 1000 * 60 * 5;
+    return new Date(Math.ceil(date.getTime() / coeff) * coeff);
+  }
+
   getEvent(id: string): Observable<CalendarEvent> {
     if (!id) return new Observable<CalendarEvent>();
     return this.db.collection('events').doc(id).valueChanges() as Observable<CalendarEvent>;
@@ -113,9 +118,15 @@ export class ApiService {
   }
 
   async addEvent(event: CalendarEvent) {
-    this.db.collection('events').doc(event.id.toString()).set(Object.assign({}, event)).then(success => {
+    const doc_ref = await this.db.collection('events').add(event);
+    event.id = doc_ref.id;
+    this.updateEvent(event);
+  }
+
+  updateEvent(event: CalendarEvent) {
+    this.db.collection('events').doc(event.id.toString()).set(event, { merge: true }).then(success => {
       console.log('Success ', success);
-      this.snackbarMessage('Event added successfully');
+      this.snackbarMessage('Event updated successfully');
     })
     .catch(error => {
       console.log('Something went wrong: ', error);
@@ -123,12 +134,15 @@ export class ApiService {
     });
   }
 
-  updateEvent(event: CalendarEvent) {
-    this.db.collection('events').doc(event.id.toString()).set(event, { merge: true });
-  }
-
   deleteEvent(event: CalendarEvent) {
-    this.db.collection('events').doc(event.id.toString()).delete();
+    this.db.collection('events').doc(event.id.toString()).delete().then(success => {
+      console.log('Success ', success);
+      this.snackbarMessage('Event deleted successfully');
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
   }
   // End of Events Region
 
@@ -155,11 +169,25 @@ export class ApiService {
   }
 
   updateUser(user: User) {
-    this.db.collection('users').doc(user.id).set(user, { merge: true });
+    this.db.collection('users').doc(user.id).set(user, { merge: true }).then(success => {
+      console.log('Success ', success);
+      this.snackbarMessage('User updated successfully');
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
   }
 
   deleteUser(user: User) {
-    this.db.collection('users').doc(user.id).delete();
+    this.db.collection('users').doc(user.id).delete().then(success => {
+      console.log('Success ', success);
+      this.snackbarMessage('User deleted successfully');
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
   }
   // End of Users Region
 

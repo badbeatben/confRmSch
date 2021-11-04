@@ -1,3 +1,4 @@
+<a href="#" style="margin: 16px;" (click)="logout()">Logout</a>
 <h1>Conference Room Scheduler</h1>
 <div class="row text-center">
     <div class="col-md-4">
@@ -17,6 +18,14 @@
     </div>
     <div class="col-md-4">
         <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+        <div *ngIf="!isEdit">
+            <button class="btn btn-warning float-right" (click)="addEvent()">
+                Add new event
+            </button>
+        </div>
+        <div *ngIf="isEdit">
+            <h3 style="text-align: center;">Event Details</h3>
+        </div>
     </div>
     <div class="col-md-4">
         <div class="btn-group">
@@ -34,6 +43,89 @@
         </div>
     </div>
 </div>
+<div class="newEvent" *ngIf="isEdit">
+    <div class="table-responsive margins">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Title: </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="modalData.event.title"
+                            (keyup)="refresh.next()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Primary Color: </td>
+                    <td>
+                        <input type="color" [(ngModel)]="modalData.event.color.primary" (change)="refresh.next()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Secondary Color: </td>
+                    <td>
+                        <input type="color" [(ngModel)]="modalData.event.color.secondary" (change)="refresh.next()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Event Start: </td>
+                    <td>
+                        <mat-form-field>
+                            <input matInput [ngxMatDatetimePicker]="start" placeholder="Choose a date & time"
+                                [(ngModel)]="modalData.event.start">
+                            <mat-datepicker-toggle matSuffix [for]="start"></mat-datepicker-toggle>
+                            <ngx-mat-datetime-picker #start [stepMinute]="5" [enableMeridian]="true"></ngx-mat-datetime-picker>
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Event End: </td>
+                    <td>
+                        <mat-form-field>
+                            <input matInput [ngxMatDatetimePicker]="end" placeholder="Choose a date & time"
+                                [(ngModel)]="modalData.event.end">
+                            <mat-datepicker-toggle matSuffix [for]="end"></mat-datepicker-toggle>
+                            <ngx-mat-datetime-picker #end [stepMinute]="5" [enableMeridian]="true"></ngx-mat-datetime-picker>
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Invitees: </td>
+                    <td>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Invitees</mat-label>
+                            <mat-select [formControl]="usersControl" ngDefaultControl multiple>
+                                <mat-option *ngFor="let user of users" [value]="user.email">
+                                    {{user.firstName}} {{user.lastName}}, {{user.email}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <button *ngIf="!isEdit" style="margin-top: 16px;" class="btn btn-danger"
+                    (click)="deleteEvent(modalData.event)">
+                    Delete
+                </button>
+                <button *ngIf="isEdit" style="margin: 16px;" class="btn btn-success"
+                    (click)="saveEvent(modalData.event)">
+                    Save
+                </button>
+                <button *ngIf="isEdit" style="margin: 16px;" class="btn btn-danger"
+                    (click)="isEdit = false">
+                    Close
+                </button>
+            </tfoot>
+        </table>
+    </div>
+</div>
 <br />
 <div class="margins" [ngSwitch]="view">
     <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
@@ -48,130 +140,3 @@
         (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
     </mwl-calendar-day-view>
 </div>
-
-<!-- Everything below is for seeing event info -->
-
-<!-- <br /><br /><br />
-
-<h3>
-    Scheduled Events
-    <button style="margin-left: 16px;" class="btn btn-primary float-right" (click)="addEvent()">
-        Add new
-    </button>
-    <div class="clearfix"></div>
-</h3>
-
-<div class="table-responsive margins">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Primary color</th>
-                <th>Secondary color</th>
-                <th>Starts at</th>
-                <th>Ends at</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr *ngFor="let event of events">
-                <td>
-                    <input type="text" class="form-control" [(ngModel)]="event.title" (keyup)="refresh.next()" />
-                </td>
-                <td>
-                    <input type="color" [(ngModel)]="event.color.primary" (change)="refresh.next()" />
-                </td>
-                <td>
-                    <input type="color" [(ngModel)]="event.color.secondary" (change)="refresh.next()" />
-                </td>
-                <td>
-                    <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="event.start"
-                        (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true"
-                        [enableTime]="true" dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
-                </td>
-                <td>
-                    <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="event.end"
-                        (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true"
-                        [enableTime]="true" dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
-                </td>
-                <td>
-                    <button class="btn btn-danger" (click)="deleteEvent(event)">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div> -->
-
-<ng-template #modalContent let-close="close">
-    <div class="modal-header">
-        <h5 class="modal-title">{{ modalData?.event.title }}</h5>
-        <button type="button" class="close" (click)="close()">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <div class="table-responsive margins">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Property</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-        
-                <tbody>
-                    <tr>
-                        <td>Title: </td>
-                        <td>
-                            <input type="text" class="form-control" [(ngModel)]="modalData.event.title" (keyup)="refresh.next()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Primary Color: </td>
-                        <td>
-                            <input type="color" [(ngModel)]="modalData.event.color.primary" (change)="refresh.next()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Secondary Color: </td>
-                        <td>
-                            <input type="color" [(ngModel)]="modalData.event.color.secondary" (change)="refresh.next()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Event Start: </td>
-                        <td>
-                            <mat-form-field style="padding-left: 8px;">
-                                <input matInput type="datetime-local" placeholder="start date">
-                            </mat-form-field>
-                            <!-- <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.start"
-                                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
-                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" /> -->
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Event End: </td>
-                        <td>
-                            <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="modalData.event.end"
-                                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
-                                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <button style="margin-top: 16px;" class="btn btn-danger" (click)="deleteEvent(event)">
-                        Delete
-                    </button>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" (click)="close()">
-            OK
-        </button>
-    </div>
-</ng-template>

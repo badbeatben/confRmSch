@@ -14,6 +14,7 @@ import {
   isSameDay,
   isSameMonth,
   addHours,
+  subHours,
 } from 'date-fns';
 import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -25,6 +26,9 @@ import {
 } from 'angular-calendar';
 import { ApiService } from 'src/app/services/api.service';
 import { Router } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { CalendarEventActionsComponent } from 'angular-calendar/modules/common/calendar-event-actions.component';
+import { User } from 'src/app/models/user';
 
 const colors: any = {
   red: {
@@ -62,6 +66,7 @@ export class CalendarComponent implements OnInit {
         
         this.api.getAllEvents().subscribe(resp => {
           if (resp) {
+            this.events = [];
             resp.forEach(event => {
               this.events.push({
                 start: event.start.toDate(),
@@ -80,26 +85,36 @@ export class CalendarComponent implements OnInit {
             this.refresh.next();
           }
         });
+
+        this.api.getAllUsers().subscribe(users => {
+          if (users) {
+            this.users = users;
+          }
+        });
       } else {
         this.router.navigate(['register']);
       }
     });
   }
   
+  @ViewChild('start') start: any;
+  @ViewChild('end') end: any;
+  
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
   viewDate: Date = new Date();
+  isEdit: boolean = false;
 
   modalData: {
     action: string;
     event: CalendarEvent;
   };
 
+  users: User[] = [];
+  usersControl = new FormControl();
   events: CalendarEvent[] = [];
-
   refresh: Subject<any> = new Subject();
-
   activeDayIsOpen: boolean = true;
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
@@ -132,33 +147,62 @@ export class CalendarComponent implements OnInit {
       }
       return iEvent;
     });
-    this.handleEvent('Dropped or resized', event);
+    
+    event.start = newStart;
+    event.end = newEnd;
+    this.saveEvent(event);
   }
 
   handleEvent(action: string, event: CalendarEvent): void {
+    this.isEdit = true;
     this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });
   }
 
-  addEvent(): void {
-    this.events = [
-      ...this.events,
-      {
-        title: 'New event',
-        start: startOfDay(new Date()),
-        end: endOfDay(new Date()),
-        color: colors.red,
-        draggable: true,
-        resizable: {
-          beforeStart: true,
-          afterEnd: true,
-        },
+  saveEvent(event = null) {
+    let emailSubject = '';
+    if (event && event.id) {
+      emailSubject = event.title;
+      event.invitesSentTo = 
+      this.api.updateEvent(event);
+    } else if (this.modalData.event.id) {
+      emailSubject = this.modalData.event.title;
+      this.api.updateEvent(this.modalData.event);
+    } else {
+      emailSubject = this.modalData.event.title;
+      this.api.addEvent(this.modalData.event);
+    }
+    var email = this.usersControl.value.join('; ');
+    var subject = 'Invitation to ' + emailSubject;
+    var emailBody = 'You have been invited to participate in ' + emailSubject + ' with participants: ' + email;
+    console.log("email list: ", email);
+    window.location.href = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
+  }
+
+  addEvent() {
+    let now = this.api.roundToNearestFive(new Date());
+    let newEvent = {
+      id: null,
+      start: now,
+      end: addHours(now, 1),
+      title: 'New Event',
+      allDay: false,
+      color: colors.red,
+      resizable: {
+        beforeStart: true,
+        afterEnd: true
       },
-    ];
+      draggable: true
+    }
+    this.handleEvent('new', newEvent);
   }
 
   deleteEvent(eventToDelete: CalendarEvent) {
-    this.events = this.events.filter((event) => event !== eventToDelete);
+    if (confirm("Delete Event?")) {
+      this.events = this.events.filter((event) => event !== eventToDelete);
+      if (eventToDelete.id) {
+        this.api.deleteEvent(eventToDelete);
+      }
+    }
   }
 
   setView(view: CalendarView) {
@@ -167,5 +211,9 @@ export class CalendarComponent implements OnInit {
 
   closeOpenMonthViewDay() {
     this.activeDayIsOpen = false;
+  }
+
+  logout() {
+    this.api.logout();
   }
 }
