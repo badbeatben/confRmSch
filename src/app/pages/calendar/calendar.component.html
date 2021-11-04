@@ -19,7 +19,7 @@
     <div class="col-md-4">
         <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
         <div *ngIf="!isEdit">
-            <button class="btn btn-warning float-right" (click)="addEvent()">
+            <button style="margin: 16px;" class="btn btn-warning float-right" (click)="addEvent()">
                 Add new event
             </button>
         </div>
@@ -43,7 +43,7 @@
         </div>
     </div>
 </div>
-<div class="newEvent" *ngIf="isEdit">
+<div class="newEvent" *ngIf="isEdit || isNew">
     <div class="table-responsive margins">
         <table class="table table-bordered">
             <thead>
@@ -89,7 +89,7 @@
                     <td>
                         <mat-form-field>
                             <input matInput [ngxMatDatetimePicker]="end" placeholder="Choose a date & time"
-                                [(ngModel)]="modalData.event.end">
+                                [(ngModel)]="modalData.event.end" [min]="modalData.event.start">
                             <mat-datepicker-toggle matSuffix [for]="end"></mat-datepicker-toggle>
                             <ngx-mat-datetime-picker #end [stepMinute]="5" [enableMeridian]="true"></ngx-mat-datetime-picker>
                         </mat-form-field>
@@ -110,7 +110,7 @@
                 </tr>
             </tbody>
             <tfoot>
-                <button *ngIf="!isEdit" style="margin-top: 16px;" class="btn btn-danger"
+                <button *ngIf="!isNew" style="margin: 16px;" class="btn btn-danger"
                     (click)="deleteEvent(modalData.event)">
                     Delete
                 </button>
@@ -119,7 +119,7 @@
                     Save
                 </button>
                 <button *ngIf="isEdit" style="margin: 16px;" class="btn btn-danger"
-                    (click)="isEdit = false">
+                    (click)="resetFlags()">
                     Close
                 </button>
             </tfoot>

@@ -74,7 +74,7 @@ export class CalendarComponent implements OnInit {
                 id: event.id,
                 title: event.title,
                 allDay: event.allDay,
-                color: colors.red,
+                color: event.color ? event.color : colors.red,
                 resizable: {
                   beforeStart: true,
                   afterEnd: true
@@ -104,6 +104,7 @@ export class CalendarComponent implements OnInit {
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
   viewDate: Date = new Date();
+  isNew: boolean = false;
   isEdit: boolean = false;
 
   modalData: {
@@ -154,15 +155,19 @@ export class CalendarComponent implements OnInit {
   }
 
   handleEvent(action: string, event: CalendarEvent): void {
+    if (action == 'new') {
+      this.isNew = true;
+    }
     this.isEdit = true;
     this.modalData = { event, action };
   }
 
   saveEvent(event = null) {
+    this.resetFlags();
     let emailSubject = '';
     if (event && event.id) {
       emailSubject = event.title;
-      event.invitesSentTo = 
+      // event.invitesSentTo = 
       this.api.updateEvent(event);
     } else if (this.modalData.event.id) {
       emailSubject = this.modalData.event.title;
@@ -201,8 +206,14 @@ export class CalendarComponent implements OnInit {
       this.events = this.events.filter((event) => event !== eventToDelete);
       if (eventToDelete.id) {
         this.api.deleteEvent(eventToDelete);
+        this.resetFlags();
       }
     }
+  }
+
+  resetFlags() {
+    this.isEdit = false;
+    this.isNew = false;
   }
 
   setView(view: CalendarView) {
