@@ -78,7 +78,7 @@
                     <td>
                         <mat-form-field>
                             <input matInput [ngxMatDatetimePicker]="start" placeholder="Choose a date & time"
-                                [(ngModel)]="modalData.event.start">
+                                [(ngModel)]="modalData.event.start" (ngModelChange)="startChanged()">
                             <mat-datepicker-toggle matSuffix [for]="start"></mat-datepicker-toggle>
                             <ngx-mat-datetime-picker #start [stepMinute]="5" [enableMeridian]="true"></ngx-mat-datetime-picker>
                         </mat-form-field>

@@ -162,6 +162,10 @@ export class CalendarComponent implements OnInit {
     this.modalData = { event, action };
   }
 
+  startChanged() {
+    this.modalData.event.end = addHours(this.modalData.event.start, 1);
+  }
+
   saveEvent(event = null) {
     this.resetFlags();
     let emailSubject = '';
@@ -176,11 +180,13 @@ export class CalendarComponent implements OnInit {
       emailSubject = this.modalData.event.title;
       this.api.addEvent(this.modalData.event);
     }
-    var email = this.usersControl.value.join('; ');
-    var subject = 'Invitation to ' + emailSubject;
-    var emailBody = 'You have been invited to participate in ' + emailSubject + ' with participants: ' + email;
-    console.log("email list: ", email);
-    window.location.href = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
+    if (this.usersControl.value) {
+      var email = this.usersControl.value.join('; ');
+      var subject = 'Invitation to ' + emailSubject;
+      var emailBody = 'You have been invited to participate in ' + emailSubject + ' with participants: ' + email;
+      console.log("email list: ", email);
+      window.location.href = "mailto:"+email+"?subject="+subject+"&body="+emailBody;
+    }
   }
 
   addEvent() {
