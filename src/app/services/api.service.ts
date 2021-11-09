@@ -6,6 +6,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { CalendarEvent } from 'angular-calendar';
 import { User } from '../models/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Invitees } from '../models/invitees';
 
 export class AuthInfo {
   constructor(public $uid: string) { }
@@ -117,13 +118,21 @@ export class ApiService {
     return this.db.collection('events').valueChanges() as Observable<any[]>;
   }
 
-  async addEvent(event: CalendarEvent) {
+  async addEvent(event: CalendarEvent, invitees: string = null) {
     const doc_ref = await this.db.collection('events').add(event);
     event.id = doc_ref.id;
+    let inv = {
+      id: 'new',
+      eventId: doc_ref.id,
+      invitees: invitees
+    };
+    
+    console.log("event: ", event, "Invites: ", inv);
     this.updateEvent(event);
+    this.addInvitees(inv);
   }
 
-  updateEvent(event: CalendarEvent) {
+  updateEvent(event: CalendarEvent, invitees: string = null) {
     this.db.collection('events').doc(event.id.toString()).set(event, { merge: true }).then(success => {
       console.log('Success ', success);
       this.snackbarMessage('Event updated successfully');
@@ -132,6 +141,22 @@ export class ApiService {
       console.log('Something went wrong: ', error);
       this.snackbarMessage(error.message);
     });
+    if (invitees) {
+      this.getInvitees(event.id.toString()).subscribe(resp => {
+        let inv = {
+          id: 'new',
+          invitees: invitees,
+          eventId: event.id.toString()
+        };
+        console.log("invitee resp: ", resp);
+        if (resp.length > 0) {
+          inv.id = resp[0].id;
+          this.updateInvitees(inv);
+        } else {
+          this.addInvitees(inv);
+        }
+      });
+    }
   }
 
   deleteEvent(event: CalendarEvent) {
@@ -190,6 +215,30 @@ export class ApiService {
     });
   }
   // End of Users Region
+
+
+  // Invitees Region
+  getInvitees(id: string): Observable<any> {
+    if (!id) return null;
+    return this.db.collection('invitees', ref => ref.where('eventId', '==', id)).valueChanges();
+  }
+
+  async addInvitees(invitees: Invitees) {
+    const doc_ref = await this.db.collection('invitees').add(invitees);
+    invitees.id = doc_ref.id;
+    this.updateInvitees(invitees);
+  }
+
+  updateInvitees(invitees: Invitees) {
+    this.db.collection('invitees').doc(invitees.id).set(invitees, { merge: true }).then(success => {
+      console.log('Invitees updated successfully', success);
+    })
+    .catch(error => {
+      console.log('Something went wrong: ', error);
+      this.snackbarMessage(error.message);
+    });
+  }
+  // End of Invitees Region
 
 
   // Display Snackbar Message

@@ -168,12 +168,13 @@ export class CalendarComponent implements OnInit {
 
   saveEvent(event = null) {
     let emailSubject = event && event.id ? event.title : this.modalData.event.title;
+    let email = null;
     if (!this.usersControl.value) {
       if (!confirm("No invitees selected...continue anyway?")) {
         return;
       }
     } else {
-      var email = this.usersControl.value.join('; ');
+      email = this.usersControl.value.join('; ');
       var subject = 'Invitation to ' + emailSubject;
       var emailBody = 'You have been invited to participate in ' + emailSubject + ' with participants: ' + email;
       console.log("email list: ", email);
@@ -182,11 +183,12 @@ export class CalendarComponent implements OnInit {
 
     this.resetFlags();
     if (event && event.id) {
-      this.api.updateEvent(event);
+      this.api.updateEvent(event, email);
     } else if (this.modalData.event.id) {
-      this.api.updateEvent(this.modalData.event);
+      this.api.updateEvent(this.modalData.event, email);
     } else {
-      this.api.addEvent(this.modalData.event);
+      console.log("going to addEvent: ", this.modalData.event, email);
+      this.api.addEvent(this.modalData.event, email);
     }
 
     this.usersControl = new FormControl();
