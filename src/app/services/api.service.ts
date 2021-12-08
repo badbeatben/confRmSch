@@ -71,6 +71,23 @@ export class ApiService {
     });
   }
 
+  public forgotPassword(email: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      this.fireAuth.auth.sendPasswordResetEmail(email)
+        .then(success => {
+          resolve(true);
+          console.log('Success ', success);
+          this.snackbarMessage('Password reset email sent');
+          // this.fireAuth.auth.confirmPasswordReset()
+        })
+        .catch(error => {
+          reject(error);
+          console.log('Something went wrong: ', error);
+          this.snackbarMessage(error.message);
+        });
+    });
+  }
+
   public signInAnonymously() {
     return new Promise<any>((resolve, reject) => {
       this.fireAuth.auth.signInAnonymously()

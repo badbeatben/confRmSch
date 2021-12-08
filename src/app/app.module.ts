@@ -28,13 +28,15 @@ import { CalendarComponent } from './pages/calendar/calendar.component';
 import { environment } from 'src/environments/environment';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CalendarComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,
